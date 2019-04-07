@@ -27,7 +27,7 @@ unsigned int OS_CRorLF()
       return 1; //LF
   #else
   #if (defined __WIN32__)
-      return 2; //CRLF
+      return 1; //CRLF
   #else
   #if (defined __MACOS__)
       return 1; //CR
@@ -114,7 +114,10 @@ public:
   }
 };
 
-void fextend(fstream& fs, char c = ' ')
+
+/* Shifts characters one by one to the end of the file. 
+ * Starting at the end of file                       */
+void fextend(fstream& fs)
 {
   if( not fs.is_open() ) return;
   
@@ -133,6 +136,7 @@ void fextend(fstream& fs, char c = ' ')
         fs.clear()                   ;
         fs << buff                   ;
       }
+  fs.clear();
 }
 
 void ftruncate(fstream& fs)
@@ -143,8 +147,16 @@ void ftruncate(fstream& fs)
   char        buff = '\0'          ;
   long           T = lastReadPos   ;
   
-  fs.seekp(T) ; 
-  \
+  if ( lastReadPos < 0 )                   //* If file has only one string
+     {
+       fs.seekp(0, ios::end) ;
+       fs.clear() ;
+       fs << " "             ;
+       return                ;
+     }
+  else
+       fs.seekp(T)           ; 
+  
   for ( ; not fs.eof() ; T++ ) 
       {
         fs.seekp(T)       ;
@@ -152,9 +164,10 @@ void ftruncate(fstream& fs)
         fs.seekp( T - 1 ) ;
         fs << buff        ;
       } 
-  fs.clear()                ;
-  fs.seekp(-1, ios::end)    ;
-  fs << ' '                 ;
+      
+  fs.clear()                           ;
+  fs.seekp(-1, ios::end)               ;
+  fs << ' '                            ;
   fs.seekg(lastReadPos - OS_CRorLF())  ; 
 }
 
@@ -166,7 +179,8 @@ int main( int argc, char** argv ) {
     string targ( argv[3] ) ; //target 
     
     if (tmpl.size() == 0 or targ.size() == 0)
-       { cout << "empty template or target strings! terminate!";
+       { 
+         cout << "empty template or target strings! terminate!";
          return 0;
        }
     
@@ -179,7 +193,7 @@ int main( int argc, char** argv ) {
          << endl; 
     
     fstream file_stream (ifle, fstream::binary | fstream::in | fstream::out) ;
-     string        line                                    ;
+     string        line                                                      ;
   
     if ( file_stream.is_open() ) 
        {
@@ -200,11 +214,13 @@ int main( int argc, char** argv ) {
                    
            int changes = sreplace( line, tmpl, targ, false) ;
            while (changes > 0) 
-                 { fextend(file_stream)                     ;              //* extend file by one symbol
+                 { 
+                   fextend(file_stream)                     ;              //* extend file by one symbol
                    changes--                                ;
                  }
            while (changes < 0)
-                 { ftruncate(file_stream)                   ;              //* filling the space formed after truncation of the line
+                 { 
+                   ftruncate(file_stream)                   ;              //* filling the space formed after truncation of the line
                    changes++                                ;              //* i really don't like it 
                  }
                  
