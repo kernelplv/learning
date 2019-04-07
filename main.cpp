@@ -184,7 +184,7 @@ int main( int argc, char** argv ) {
        {
                        bool     first_line = true        ;
               unsigned long    before_read = 0           ;
-         const unsigned int END_LINE_BYTES = OS_CRorLF() ;                         //LF(U+000A) or CR(U+000D) invisible symbols
+         const unsigned int END_LINE_BYTES = OS_CRorLF() ;                 //LF(U+000A) or CR(U+000D) invisible symbols
    
          do 
          {
