@@ -1,7 +1,7 @@
 /* @kernelplv 
  * Замена подстроки в текстовом файле 
  * без создания нового файла.
- * Поддержка          */
+ */
  
 #include <iostream>
 #include "Test.h"
@@ -15,6 +15,7 @@
  * using namespace boost::filesystem;
  * g++ -std=c++17
  * -lboost_filesystem (linker option)
+ * MinGW has a bug with filesystem library c++17
  */
  
 using namespace TestSuite;
@@ -37,17 +38,19 @@ unsigned int OS_CRorLF()
   #endif
 }
 
-void rstr(string& s) {
-    reverse(s.begin(),s.end());
+void rstr(string& s) 
+{
+  reverse(s.begin(),s.end());
 }
 
 
-void toline(string& s) {
-    for (char& c : s) {
-        c = tolower(c);
-    }
+void toline(string& s) 
+{
+  for (char& c : s) 
+      {
+        c = tolower(c) ;
+      }
 }
-
 
 int sreplace( string&     str      ,
          const string    tmpl = " ",
@@ -99,14 +102,16 @@ int sreplace( string&     str      ,
     return resized ;
     
 }
-class test_rstr : public Test {
-    string s;
+class test_rstr : public Test 
+{
+  string s;
 public:
-    test_rstr() : s(string("12345")) {};
-    void run() {
-        rstr(s);
-        test_(s == "54321");
-    }
+  test_rstr() : s(string("12345")) {};
+  void run() 
+  {
+    rstr(s);
+    test_(s == "54321");
+  }
 };
 
 void fextend(fstream& fs, char c = ' ')
@@ -119,9 +124,7 @@ void fextend(fstream& fs, char c = ' ')
   
   fs.seekp(0, ios::end) ; 
   
-  for (                           ;
-        lastReadPos < fs.tellp()  ;
-        T++                       ) 
+  for (; lastReadPos < fs.tellp() ; T++ ) 
       {
         fs.seekp(   -(T), ios::end ) ;
         fs.clear()                   ;
@@ -142,9 +145,7 @@ void ftruncate(fstream& fs)
   
   fs.seekp(T) ; 
   \
-  for (              ;
-        not fs.eof() ;
-        T++          ) 
+  for ( ; not fs.eof() ; T++ ) 
       {
         fs.seekp(T)       ;
         buff = fs.peek()  ;
@@ -157,7 +158,7 @@ void ftruncate(fstream& fs)
   fs.seekg(lastReadPos - OS_CRorLF())  ; 
 }
 
-    //todo github connect and anytime save-version  
+
 int main( int argc, char** argv ) {
        
     string ifle( argv[1] ) ; //input file
@@ -213,18 +214,11 @@ int main( int argc, char** argv ) {
                 first_line = false                              ; 
               }
            else 
-                file_stream.seekp(before_read + END_LINE_BYTES) ;                 //* CR and LF simbols..its very dangerous
+                file_stream.seekp(before_read + END_LINE_BYTES) ;           //* CR and LF simbols..its very dangerous
 
-//           if ( file_stream.eof() ) 
-//              {                                                                 //* last chance to write last line to file
-////                file_stream.clear()                             ;             //* dangerous too                                                       
-////                file_stream.seekp(before_read + END_LINE_BYTES) ;
-////                file_stream << line                             ;
-////                file_stream.setstate(ios_base::eofbit)          ;
-//              }
-//           else
            file_stream << line ;
            file_stream.flush() ;
+           
            cout << "Line: " 
                 << line
                 << endl        ;
