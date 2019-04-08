@@ -138,7 +138,7 @@ void fextend(fstream& fs)
       }
   fs.clear();
 }
-
+//!!!!!!!!!!!!!!!!!
 void ftruncate(fstream& fs)
 {
   if( not fs.is_open() ) return;
@@ -147,15 +147,7 @@ void ftruncate(fstream& fs)
   char        buff = '\0'          ;
   long           T = lastReadPos   ;
   
-  if ( lastReadPos < 0 )                   //* If file has only one string
-     {
-       fs.seekp(0, ios::end) ;
-       fs.clear() ;
-       fs << " "             ;
-       return                ;
-     }
-  else
-       fs.seekp(T)           ; 
+  fs.seekp(T) ; 
   
   for ( ; not fs.eof() ; T++ ) 
       {
@@ -164,10 +156,11 @@ void ftruncate(fstream& fs)
         fs.seekp( T - 1 ) ;
         fs << buff        ;
       } 
-      
+  fs.sync();    
   fs.clear()                           ;
   fs.seekp(-1, ios::end)               ;
   fs << ' '                            ;
+  fs.flush()                           ;
   fs.seekg(lastReadPos - OS_CRorLF())  ; 
 }
 
@@ -226,6 +219,7 @@ int main( int argc, char** argv ) {
                  
            if ( first_line )
               { 
+                file_stream.clear();  
                 file_stream.seekp(0)                            ;
                 first_line = false                              ; 
               }
