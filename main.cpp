@@ -27,7 +27,7 @@ unsigned int OS_CRorLF()
       return 1; //LF
   #else
   #if (defined __WIN32__)
-      return 1; //CRLF
+      return 2; //CRLF
   #else
   #if (defined __MACOS__)
       return 1; //CR
@@ -36,6 +36,38 @@ unsigned int OS_CRorLF()
   #endif
   #endif
   #endif
+}
+
+string getLineTerminators(fstream& s)
+{
+  string        CRLF = ""    ;  
+    bool CR_detected = false ;
+  
+  if ( not s.is_open() )
+     {
+       cout << "getLineTerminators: file not opened!" << endl ; 
+       return "" ;
+     }
+     
+  long gpos = s.tellg() ;
+  char buff = '\0'      ;
+  
+  while ( not s.eof() ) 
+  {
+   buff = s.get(); 
+    if ( buff == '\r' and not CR_detected )                                         //*ohh my god windows...
+       {                 
+         CRLF += buff       ;
+         CR_detected = true ;
+       }
+    if ( buff == '\n' ) CRLF += buff ;
+    
+    if ( buff != '\n' and CR_detected ) 
+                          return CRLF ;
+  }
+  s.seekg(gpos) ;
+  return CRLF ;
+        
 }
 
 void rstr(string& s) 
@@ -143,10 +175,29 @@ void ftruncate(fstream& fs)
 {
   if( not fs.is_open() ) return;
   
-  long lastReadPos = fs.tellg()    ;
-  char        buff = '\0'          ;
-  long           T = lastReadPos   ;
+         long lastReadPos = fs.tellg()  ;
+         char        buff = '\0'        ;
+         long           T = lastReadPos ;
+  static long        last = 0           ;
   
+  if ( lastReadPos < 0 or last )                                               //* If the last line
+     { 
+       fs.sync()              ;  
+       fs.clear()             ; 
+       if ( not last )
+          {
+            fs.seekg(-1, ios::end) ;  
+            last = fs.tellg()      ; 
+          }
+       fs.seekp(last) ;
+       fs << ' '      ;
+       fs.flush()     ;
+       last--         ; 
+       return ;
+     }
+  else 
+       last = 0       ;
+       
   fs.seekp(T) ; 
   
   for ( ; not fs.eof() ; T++ ) 
@@ -192,13 +243,15 @@ int main( int argc, char** argv ) {
        {
                        bool     first_line = true        ;
               unsigned long    before_read = 0           ;
-         const unsigned int END_LINE_BYTES = OS_CRorLF() ;                 //LF(U+000A) or CR(U+000D) invisible symbols
+         const unsigned int END_LINE_BYTES = \
+         getLineTerminators(file_stream).size() ;                 //* LF(U+000A) or CR(U+000D) invisible symbols
    
          do 
          {
            file_stream.sync()                ;
            before_read = file_stream.tellg() ;
-           file_stream >> line               ; 
+           //ile_stream >> line               ;
+           getline(file_stream, line);  
               
            cout << "Line: " 
                 << line 
