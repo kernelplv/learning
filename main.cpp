@@ -37,7 +37,7 @@ unsigned int OS_CRorLF()
   #endif
   #endif
 }
-void writeline(fstream& s, const string line)
+void writeline(fstream& s, const string line, const long start = -1 )
 {  
   if ( not s.is_open() )
      {
@@ -45,15 +45,20 @@ void writeline(fstream& s, const string line)
        return ;
      } 
   
-  bool lastWrite = false          ;
-  if ( s.eof() ) lastWrite = true ;
-  
-  s.clear() ;                                                     //* if trancate func set eof
+  bool lastWrite = false           ;
+  if ( !s ) lastWrite = true       ;
+  if ( start >= 0 ) 
+     {
+       s.clear()      ;                                           //* if trancate func set eof
+       s.seekp(start) ;
+     }
+                                                       
   for ( char c : line )
       {
         s.put( c ) ;
         s.flush()  ;
       }
+      
   if ( lastWrite ) s.setstate( ios::badbit) ;                     //* eof insufficient reason to break the loop "while(stream)" O_o wtf?
 }
 string readline(fstream& s, const char endline = '\n')
@@ -212,9 +217,10 @@ void fextend(fstream& fs)
         buff = fs.peek()             ;
         fs.seekp( -(T-1), ios::end ) ;    
         fs.clear()                   ;
-        fs << buff                   ;
+        fs.put(buff)                 ;
       }
-  fs.clear();
+  //fs.clear();
+  fs.seekg(lastReadPos);
 }
 
 void ftruncate(fstream& fs, const unsigned int endlinesize = 1)
@@ -249,7 +255,7 @@ void ftruncate(fstream& fs, const unsigned int endlinesize = 1)
   else 
        last = 0       ;
        
-  fs.seekp(T) ; \
+  fs.seekp(T) ; 
   
   for ( ; fs.tellp() < endOfFile ; T++ ) 
       {
@@ -263,8 +269,7 @@ void ftruncate(fstream& fs, const unsigned int endlinesize = 1)
   fs.seekp(-1, ios::end)               ;
   fs << ' '                            ;
   fs.flush()                           ;
-  int tt = fs.tellg();
-  fs.seekg(lastReadPos - 1) ; 
+  fs.seekg(lastReadPos - 1)            ; 
 }
 
 
@@ -327,9 +332,12 @@ int main( int argc, char** argv ) {
                 first_line = false                 ; 
               }
            else 
-                file_stream.seekp(before_read + 0) ;                       //* CR and LF simbols..its very dangerous
+                file_stream.seekp(before_read + 0) ;                       //* + CR and LF simbols..its very dangerous
 
-           writeline(file_stream, line) ;
+           int t = file_stream.tellg();
+           int tt = file_stream.tellp();
+            if (file_stream.eof()) cout<<"000";
+           writeline(file_stream, line, before_read) ;
            file_stream.flush() ;
 
            cout << "Line: " 
