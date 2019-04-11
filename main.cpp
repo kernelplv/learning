@@ -37,6 +37,49 @@ unsigned int OS_CRorLF()
   #endif
   #endif
 }
+void writeline(fstream& s, const string line)
+{  
+  if ( not s.is_open() )
+     {
+       cout << "writeline: file not opened!" << endl ; 
+       return ;
+     } 
+  
+  bool lastWrite = false          ;
+  if ( s.eof() ) lastWrite = true ;
+  
+  s.clear() ;                                                     //* if trancate func set eof
+  for ( char c : line )
+      {
+        s.put( c ) ;
+        s.flush()  ;
+      }
+  if ( lastWrite ) s.setstate( ios::badbit) ;                     //* eof insufficient reason to break the loop "while(stream)" O_o wtf?
+}
+string readline(fstream& s, const char endline = '\n')
+{
+  if ( not s.is_open() )
+     {
+       cout << "readline: file not opened!" << endl ; 
+       return "" ;
+     } 
+     
+    char buff = '\0' ;   
+  string line = ""   ;
+  
+  while ( s and buff != endline)
+        {
+          buff = s.get() ;
+          if (not s) 
+             {
+               s.setstate(ios::eofbit) ;  
+               return line             ;                          //* in example if read endOFfile symbol
+             }
+          line += buff   ;
+        }
+  
+  return line ;
+}
 
 string getLineTerminators(fstream& s)
 {
@@ -53,19 +96,22 @@ string getLineTerminators(fstream& s)
   char buff = '\0'      ;
   
   while ( not s.eof() ) 
-  {
-   buff = s.get(); 
-    if ( buff == '\r' and not CR_detected )                                         //*ohh my god windows...
-       {                 
-         CRLF += buff       ;
-         CR_detected = true ;
-       }
-    if ( buff == '\n' ) CRLF += buff ;
-    
-    if ( buff != '\n' and CR_detected ) 
-                          return CRLF ;
-  }
+        {
+          buff = s.get(); 
+          if ( buff != '\n' and CR_detected ) 
+                                      break ;
+          if ( buff == '\r' and not CR_detected )                                         //*ohh my god windows...
+             {                 
+               CRLF += buff       ;
+               CR_detected = true ;
+             }
+          if ( buff == '\n' ) CRLF += buff ;
+          
+          
+        }
+  s.clear()     ;
   s.seekg(gpos) ;
+  cout << s.tellg() <<" " << s.tellp();
   return CRLF ;
         
 }
@@ -170,20 +216,24 @@ void fextend(fstream& fs)
       }
   fs.clear();
 }
-//!!!!!!!!!!!!!!!!!
-void ftruncate(fstream& fs)
+
+void ftruncate(fstream& fs, const unsigned int endlinesize = 1)
 {
   if( not fs.is_open() ) return;
   
-         long lastReadPos = fs.tellg()  ;
-         char        buff = '\0'        ;
-         long           T = lastReadPos ;
-  static long        last = 0           ;
+           long lastReadPos = fs.tellg()  ;
+  unsigned long   endOfFile = 0           ;    
+           char        buff = '\0'        ;
+           long           T = lastReadPos ;
+    static long        last = 0           ;
+  
+  fs.seekg(-1, ios::end) ;
+  endOfFile = fs.tellg() ;
+  fs.seekg(lastReadPos)  ;
   
   if ( lastReadPos < 0 or last )                                               //* If the last line
      { 
-       fs.sync()              ;  
-       fs.clear()             ; 
+       fs.clear() ; 
        if ( not last )
           {
             fs.seekg(-1, ios::end) ;  
@@ -193,26 +243,28 @@ void ftruncate(fstream& fs)
        fs << ' '      ;
        fs.flush()     ;
        last--         ; 
+       fs.setstate(ios::eofbit);
        return ;
      }
   else 
        last = 0       ;
        
-  fs.seekp(T) ; 
+  fs.seekp(T) ; \
   
-  for ( ; not fs.eof() ; T++ ) 
+  for ( ; fs.tellp() < endOfFile ; T++ ) 
       {
         fs.seekp(T)       ;
-        buff = fs.peek()  ;
+        buff = fs.get()   ;
         fs.seekp( T - 1 ) ;
-        fs << buff        ;
+        fs.put(buff)      ;
+        fs.flush()        ;
       } 
-  fs.sync();    
   fs.clear()                           ;
   fs.seekp(-1, ios::end)               ;
   fs << ' '                            ;
   fs.flush()                           ;
-  fs.seekg(lastReadPos - OS_CRorLF())  ; 
+  int tt = fs.tellg();
+  fs.seekg(lastReadPos - 1) ; 
 }
 
 
@@ -241,22 +293,20 @@ int main( int argc, char** argv ) {
   
     if ( file_stream.is_open() ) 
        {
-                       bool     first_line = true        ;
-              unsigned long    before_read = 0           ;
-         const unsigned int END_LINE_BYTES = \
-         getLineTerminators(file_stream).size() ;                 //* LF(U+000A) or CR(U+000D) invisible symbols
+                       bool     first_line = true                            ;
+              unsigned long    before_read = 0                               ;
+               const string        endline = getLineTerminators(file_stream) ;    
+         const unsigned int END_LINE_BYTES = endline.size()                  ;            //* LF(U+000A) or CR(U+000D) invisible symbols               
    
          do 
          {
-           file_stream.sync()                ;
-           before_read = file_stream.tellg() ;
-           //ile_stream >> line               ;
-           getline(file_stream, line);  
+           before_read = file_stream.tellg()              ;
+           line = readline( file_stream, endline.back() ) ;
               
            cout << "Line: " 
                 << line 
                 << " replaced by: " 
-                << endl                      ;
+                << endl ;
                    
            int changes = sreplace( line, tmpl, targ, false) ;
            while (changes > 0) 
@@ -266,27 +316,27 @@ int main( int argc, char** argv ) {
                  }
            while (changes < 0)
                  { 
-                   ftruncate(file_stream)                   ;              //* filling the space formed after truncation of the line
+                   ftruncate(file_stream, END_LINE_BYTES)   ;              //* filling the space formed after truncation of the line
                    changes++                                ;              //* i really don't like it 
                  }
                  
            if ( first_line )
               { 
-                file_stream.clear();  
-                file_stream.seekp(0)                            ;
-                first_line = false                              ; 
+                file_stream.clear()                ;  
+                file_stream.seekp(0)               ;
+                first_line = false                 ; 
               }
            else 
-                file_stream.seekp(before_read + END_LINE_BYTES) ;           //* CR and LF simbols..its very dangerous
+                file_stream.seekp(before_read + 0) ;                       //* CR and LF simbols..its very dangerous
 
-           file_stream << line ;
+           writeline(file_stream, line) ;
            file_stream.flush() ;
-           
+
            cout << "Line: " 
                 << line
                 << endl        ;
              
-         } while( not file_stream.eof() ) ;    
+         } while( file_stream ) ;    
        }
     else
          cout << "File can't be opened.. terminate!" << endl ;
