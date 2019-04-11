@@ -134,7 +134,7 @@ void toline(string& s)
         c = tolower(c) ;
       }
 }
-
+//*!!!
 int sreplace( string&     str      ,
          const string    tmpl = " ",
          const string    trgt = "_",
@@ -158,25 +158,35 @@ int sreplace( string&     str      ,
          {
            aftercut += buffer.front() ;
            buffer.erase(0, 1)         ;
-           buffer += *it              ;
           
            if ( End ) 
               { 
-                while ( buffer.size() > 1 )                    //* 1 because the last character of buffer(string) is NULL('\0').
+                while ( buffer.size() > 0 )                    //* 1 because the last character of buffer(string) is NULL('\0').
                       { 
                         aftercut += buffer.front() ;
                         buffer.erase(0, 1)         ;
                       }
               }
            else 
-                it++ ; 
+                {
+                  buffer += *it ;
+                  it++ ;
+                }
          }
       else 
-         {
-           aftercut += targ                     ;
-           buffer = string(it,it + tmpl.size()) ;
-           it += tmpl.size()                    ;
-         }
+           {
+             aftercut += targ ;
+             buffer.clear()   ;
+             //buffer = string(it,it + tmpl.size()) ;
+             //it += tmpl.size()                    ;
+             unsigned int count = 0 ;
+             for ( ; it < str.end() and count < tmpl.size()
+                   ; it++, count++                        )
+                 {
+                   buffer += *it ;
+                 }
+             count = 0              ;
+           }
     }
     
     int resized = aftercut.size() - str.size() ;
@@ -334,15 +344,12 @@ int main( int argc, char** argv ) {
            else 
                 file_stream.seekp(before_read + 0) ;                       //* + CR and LF simbols..its very dangerous
 
-           int t = file_stream.tellg();
-           int tt = file_stream.tellp();
-            if (file_stream.eof()) cout<<"000";
            writeline(file_stream, line, before_read) ;
-           file_stream.flush() ;
+           file_stream.flush()                       ;
 
            cout << "Line: " 
                 << line
-                << endl        ;
+                << endl ;
              
          } while( file_stream ) ;    
        }

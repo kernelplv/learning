@@ -71,7 +71,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="&quot;test.txt&quot; &quot;___&quot; &quot;5&quot;" UseSeparateDebugArgs="no" DebugArguments="&quot;test.txt&quot; &quot;from&quot; &quot;to&quot;" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="&quot;test.txt&quot; &quot;__&quot; &quot;0&quot;" UseSeparateDebugArgs="no" DebugArguments="&quot;test.txt&quot; &quot;from&quot; &quot;to&quot;" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
