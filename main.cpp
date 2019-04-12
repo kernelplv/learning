@@ -69,7 +69,7 @@ string readline(fstream& s, const char endline = '\n')
        return "" ;
      } 
      
-    char buff = '\0' ;   
+    char buff = 'G' ;   
   string line = ""   ;
   
   while ( s and buff != endline)
@@ -123,7 +123,7 @@ string getLineTerminators(fstream& s)
 
 void rstr(string& s) 
 {
-  reverse(s.begin(),s.end());
+  reverse( s.begin(),s.end() ) ;
 }
 
 
@@ -134,7 +134,7 @@ void toline(string& s)
         c = tolower(c) ;
       }
 }
-//*!!!
+
 int sreplace( string&     str      ,
          const string    tmpl = " ",
          const string    trgt = "_",
@@ -170,15 +170,14 @@ int sreplace( string&     str      ,
            else 
                 {
                   buffer += *it ;
-                  it++ ;
+                  it++          ;
                 }
          }
       else 
            {
              aftercut += targ ;
              buffer.clear()   ;
-             //buffer = string(it,it + tmpl.size()) ;
-             //it += tmpl.size()                    ;
+
              unsigned int count = 0 ;
              for ( ; it < str.end() and count < tmpl.size()
                    ; it++, count++                        )
@@ -197,14 +196,14 @@ int sreplace( string&     str      ,
 }
 class test_rstr : public Test 
 {
-  string s;
+  string s ;
 public:
   test_rstr() : s(string("12345")) {};
   void run() 
-  {
-    rstr(s);
-    test_(s == "54321");
-  }
+       {
+         rstr(s)             ;
+         test_(s == "54321") ;
+       }
 };
 
 
@@ -229,10 +228,13 @@ void fextend(fstream& fs)
         fs.clear()                   ;
         fs.put(buff)                 ;
       }
-  //fs.clear();
   fs.seekg(lastReadPos);
 }
 
+/* Shift of characters to the current position of the read / write pointer. 
+ * A space is added to the end to keep the file at the same size.
+ * One call - one character shift.
+ */
 void ftruncate(fstream& fs, const unsigned int endlinesize = 1)
 {
   if( not fs.is_open() ) return;
