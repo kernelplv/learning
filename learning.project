@@ -6,8 +6,15 @@
     </Plugin>
   </Plugins>
   <VirtualDirectory Name="TESTS">
+    <VirtualDirectory Name="5">
+      <VirtualDirectory Name="sources">
+        <File Name="5_1" ExcludeProjConfig="Debug;"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="headers"/>
+    </VirtualDirectory>
     <VirtualDirectory Name="3">
       <VirtualDirectory Name="sources">
+        <File Name="3_6.cpp" ExcludeProjConfig="Debug;"/>
         <File Name="3_5.cpp" ExcludeProjConfig="Debug;"/>
         <File Name="3_4.cpp" ExcludeProjConfig="Debug;"/>
         <File Name="3_3.cpp" ExcludeProjConfig="Debug;"/>
@@ -45,6 +52,7 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="h">
+    <File Name="LTools.h"/>
     <File Name="Suite.h"/>
     <File Name="Test.h"/>
   </VirtualDirectory>
@@ -52,6 +60,7 @@
   <Dependencies/>
   <VirtualDirectory Name="src">
     <File Name="main.cpp"/>
+    <File Name="LTools.cpp"/>
     <File Name="Suite.cpp"/>
     <File Name="Test.cpp"/>
   </VirtualDirectory>
@@ -71,7 +80,7 @@
       </Compiler>
       <Linker Options="" Required="yes"/>
       <ResourceCompiler Options="" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="&quot;test.txt&quot; &quot;to&quot; &quot;from&quot;" UseSeparateDebugArgs="no" DebugArguments="&quot;test.txt&quot; &quot;from&quot; &quot;to&quot;" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="&quot;test.txt&quot; &quot;from&quot; &quot;to&quot;" UseSeparateDebugArgs="no" DebugArguments="&quot;test.txt&quot; &quot;from&quot; &quot;to&quot;" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>

@@ -1,1 +1,1 @@
-./Debug/Test.cpp.o ./Debug/Suite.cpp.o ./Debug/main.cpp.o   
+./Debug/LTools.cpp.o ./Debug/Test.cpp.o ./Debug/Suite.cpp.o ./Debug/main.cpp.o   
