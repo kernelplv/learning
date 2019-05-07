@@ -1,0 +1,60 @@
+/* @kernelplv 
+ * Замена подстроки в текстовом файле 
+ * без создания нового файла.
+ */
+ 
+#include <iostream>
+#include "Test.h"
+#include "Suite.h"
+#include <string>
+#include <algorithm>
+#include <fstream>
+#include <cmath>
+#include <sstream>
+#include "LTools.h"
+#include <regex>
+
+/* #include <boost/filesystem;
+ * using namespace boost::filesystem;
+ * g++ -std=c++17
+ * -lboost_filesystem (linker option)
+ * MinGW has a bug with filesystem library c++17
+ */
+ 
+using namespace TestSuite;
+using namespace std;
+
+//partialspec
+template<typename T> 
+T testf(T value)
+{
+  cout << "Partial: " << value << endl ;
+  
+  return value ;
+}
+
+//fullspec
+template<>
+int testf<int>(int value)
+{
+  cout << "Full: " << value << endl ;
+  
+  return value ;
+}
+
+template<typename S>
+S testf(string value)
+{
+  cout << "Overloaded: " << value << endl ;  
+    
+  return sizeof(S) ;
+}
+
+
+int main( int argc, char** argv ) 
+{
+  double prt = testf<double>(3.14) ;
+     int fll = testf<int>(25)      ;
+     int ovr = testf<int>("text")  ;
+  return 0;
+}

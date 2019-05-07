@@ -6,8 +6,14 @@
     </Plugin>
   </Plugins>
   <VirtualDirectory Name="TESTS">
+    <VirtualDirectory Name="sorting">
+      <File Name="hardtreesort.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="easytreesort.cpp" ExcludeProjConfig="Debug;"/>
+      <File Name="insertionsort.cpp" ExcludeProjConfig="Debug;"/>
+    </VirtualDirectory>
     <VirtualDirectory Name="5">
       <VirtualDirectory Name="sources">
+        <File Name="5_3" ExcludeProjConfig="Debug;"/>
         <File Name="5_1" ExcludeProjConfig="Debug;"/>
       </VirtualDirectory>
       <VirtualDirectory Name="headers"/>
@@ -59,7 +65,7 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="main.cpp"/>
+    <File Name="main.cpp" ExcludeProjConfig="Debug;"/>
     <File Name="LTools.cpp"/>
     <File Name="Suite.cpp"/>
     <File Name="Test.cpp"/>
