@@ -85,8 +85,6 @@ TreeSort::TreeSort(int* I, const int size)
   
   std::copy(I, I + size, A);
   
-      int*    F = A                   ;
-      int*    L = A + size - 1        ;
   bintree* tree = new bintree( A[0] ) ;
   
   for ( int i = 1 ; i < size ; i++ )
